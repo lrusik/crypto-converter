@@ -1,0 +1,104 @@
+.select {
+   position: relative;
+}
+
+.selector {
+   background-color: white;
+   position: relative;
+   font-size: 17px;
+   border: 1px solid var(--border);
+   cursor: pointer;
+}
+
+.selector:hover .selector__label {
+   color: black;
+   cursor: pointer;
+}
+
+.selector:hover .selector__arrow {
+   border-color: black;
+}
+
+.selector__label {
+   color: var(--ft-second-dark);
+   transition: color .2s; 
+   padding: 8px 0 8px 17px; 
+   display: block;
+   font-size: 16px;
+}
+
+.selector__select {
+   position: absolute;
+   right: 0;
+   top: 0;
+
+   width: 40px;
+   height: 100%;
+}
+
+.selector__select:after {
+   display: block;
+   content: "";
+
+   position: absolute;
+   right: 40px;
+   top: 50%;
+
+   height: 75%;
+   width: 1px;
+
+   transform: translateY(-50%);
+
+   background-color: var(--ft-second-dark);
+}
+
+.selector__arrowwrapper {
+   position: relative;
+
+   width: 100%;
+   height: 100%;
+}
+
+.selector__arrow {
+   position: absolute;
+   top: 50%;
+   left: 35%;
+   transform: rotate(45deg) translate(-50%, -50%);
+
+   width: 10px;
+   height: 10px;
+   border-right: 2px solid var(--ft-second-dark);
+   border-bottom: 2px solid var(--ft-second-dark);
+
+   transition: border-color .2s;  
+}
+
+.select-submenu {
+   overflow-y: auto;
+   overflow-x  
+   : hidden;
+   display: none;
+   position: absolute;
+   
+   width: 100%;
+   top: 100%;
+   left: 0;
+   max-height: 200px;
+}
+
+.select-submenu__item {
+   font-size: 16px;
+   display: block;
+   width: 100%;
+   color: black;
+   padding: 8px 17px;
+   background-color: white;
+   cursor: pointer;
+   user-select: none;
+
+   transition: background .3s;
+}
+
+.select-submenu__item_active {
+   background-color: #dfdfdf;
+}

@@ -1,0 +1,8 @@
+exports[`test matches snapshot 1`] = `
+<button
+  className="main-button"
+  data-testid="button"
+  id="button">
+  click me
+</button>
+`;

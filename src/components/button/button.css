@@ -1,0 +1,9 @@
+.main-button {
+   background-color: blue;
+   color: white;
+   border: 1px solid white;
+   padding: 5px;
+   display: inline-block;  
+   font-size: 40px;
+   cursor: pointer;
+}

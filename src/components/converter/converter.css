@@ -1,0 +1,42 @@
+.container_converter {
+   display: flex;
+   justify-content: center;
+}
+
+.converter {
+   background-color: var(--bg-second);
+   display: block;
+   
+   max-width: 650px;
+   width: 100%;
+   
+   padding: 50px;
+   margin-top: 50px;
+   margin-bottom: 50px;
+   border-radius: 3px;
+}
+
+.converter__field {
+   width: 40%;
+}
+
+.converter__currencies {
+   display: flex;
+   justify-content: space-between;
+   margin-bottom: 10px;
+}
+
+.converter__selector {
+   width: 100%;
+}
+
+.converter__inputs {
+   display: flex;
+   justify-content: space-between;
+}
+
+.converter__input {
+   width: 100%;
+   padding: 8px 17px;
+   font-size: 16px;
+}
