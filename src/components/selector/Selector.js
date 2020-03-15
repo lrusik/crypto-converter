@@ -7,7 +7,7 @@ class Selector extends Component {
       this.state = {
          lastLabel: this.props.label, 
          label: this.props.label, 
-         curnsies : this.props.curnsies
+         curs : this.props.curs
       }
    }
 
@@ -33,7 +33,7 @@ class Selector extends Component {
          submenu.style.display = "block";   
          label.style.cursor = "text";
          label.focus();
-         label.select();
+         label.select(e);
       }
    }
 
@@ -63,19 +63,25 @@ class Selector extends Component {
 
    convertToLabel = (val) => {
       let ret = "";
-      this.state.curnsies.forEach( ( item ) => {
+      this.state.curs.forEach( ( item ) => {
          if(val.toUpperCase().includes(item[1]) || val.toUpperCase().includes(item[2].toUpperCase()))
             ret = item[2] + " (" + item[1] + ")";       
       });
       return ret;
    }
 
-   select = (val) => {
-      const label = this.convertToLabel(val);
+   select = (e) => {
+      const label = this.convertToLabel(e.target.value);
+      
 
       if(label !== "") {
+         const id = e.target.parentElement.parentElement.querySelector(".selector__label").id;
+         const cur = e.target.getAttribute('cur');
+         
+         this.props.setCur.bind(this, id, cur);
+         this.props.setCur(id, cur);
+         
          this.setState( { label: label, lastLabel: label });
-         this.props.convert();
       } else {
          this.setState( { label: this.state.lastLabel });
       }
@@ -120,25 +126,25 @@ class Selector extends Component {
    }
 
    search = (val) => {
-      let curnsies = [];
+      let curs= [];
       
       if(val === ""){
-         curnsies = this.props.curnsies
+         curs = this.props.curs
       } else {
-         this.props.curnsies.forEach( ( item ) => {
+         this.props.curs.forEach( ( item ) => {
             if(item[1].includes(val.toUpperCase()) || item[2].toUpperCase().includes(val.toUpperCase()))
-               curnsies.push(item);
+               curs.push(item);
          });
       }
       
-      this.setState( {curnsies: curnsies} );
+      this.setState( {curs: curs} );
    }
 
    onKeyDown = (e) => {
       const parent = e.target.parentElement.parentElement;
       if(e.key === "Enter"){
          parent.querySelector(".select-submenu").style.display = "none";
-         this.select(e.target.value)
+         this.select(e)
       } else if(e.key === "ArrowDown"){
          this.hoverItemOnArrow(parent, 1);
       } else if(e.key === "ArrowUp") {
@@ -147,14 +153,15 @@ class Selector extends Component {
    }
 
    selectItem = (e) => {
-      this.select(e.target.innerText);
+      e.target.value=e.target.innerText; 
+      this.select(e);
    }
 
    render() {
       return (
          <div className="select">
             <div className="select selector" onClick={this.menu}>
-               <input className="selector__label" onChange={this.changeInput} onKeyDown={this.onKeyDown} value={this.state.label} />
+               <input className="selector__label" onChange={this.changeInput} onKeyDown={this.onKeyDown} id={this.props.id} value={this.state.label} />
                <div className="selector__select"
                >
                   <div className="selector__arrowwrapper">
@@ -164,12 +171,13 @@ class Selector extends Component {
             </div>
             <div className="select select-submenu">
                { 
-                  this.state.curnsies.map( (cur) => (
+                  this.state.curs.map( (cur) => (
                   <div 
                      className="select-submenu__item" 
                      key={cur[0]} 
                      onClick={this.selectItem} 
                      onMouseEnter={this.hoverItem}
+                     cur={ cur[1] }
                   >
                      {cur[2] } ({cur[1]})
                   </div>    

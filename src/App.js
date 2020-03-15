@@ -7,7 +7,7 @@ class App extends Component {
   state = {
     currencies : [
       [0, "USD", "Dollar", 1 ], 
-      [1, "BTC", "Bitcoin", 5511.23 ], 
+      [1, "BTC", "Bitcoin", 5511.2301 ], 
       [2, "ETH", "Ethereum", 132.13 ],
       [3, "XRP", "XRP", 0.15892],
       [4, "FAKE", "FakeCoin", 1]
@@ -17,7 +17,7 @@ class App extends Component {
   render() {
     return (
       <div className="app"> 
-        <Converter curnsies={this.state.currencies} />
+        <Converter curs={this.state.currencies} />
         <List />
       </div>
     );
