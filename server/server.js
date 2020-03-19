@@ -1,4 +1,3 @@
-//1. Import coingecko-api
 const CoinGecko = require('coingecko-api');
 const fs = require('fs');
 const path = require('path');
@@ -27,9 +26,6 @@ function saveData(data, file) {
 	});
 }
 
-function renewCoinsAvailable(data) {
-	return;
-}
 
 async function coinsData(callback, res) {
 	const coins = await CoinGeckoClient.coins.all();
@@ -38,12 +34,19 @@ async function coinsData(callback, res) {
 	});
 
 	let result = {};
-
+	let img;
 	for(let i=0; i < 50; i++) {
-		result[coinsAvailable[i]] = [ 
-			coins["data"][i]["name"],
-			coins["data"][i]["market_data"]["price_change_percentage_24h"]
-		]		
+		
+		try {	
+			result[coinsAvailable[i]] = [ 
+				coins["data"][i]["name"],
+				parseFloat(coins["data"][i]["market_data"]["price_change_percentage_24h"].toFixed(2)),
+				coins["data"][i]["image"]["thumb"], 
+			]	
+		}
+		catch(err){
+			console.log("Can't get some data");
+		}	
 	}
 
 	cc.priceFull(coinsAvailable, ["USD"])
@@ -51,8 +54,8 @@ async function coinsData(callback, res) {
 		coinsAvailable.forEach( (coin) => {
 			let cnt = result[coin];
 			cnt.push(growMap[coin]);
-			cnt.push(price[coin]["USD"]["PRICE"]);
-			cnt.push(price[coin]["USD"]["MKTCAP"])
+			cnt.push(parseFloat(price[coin]["USD"]["PRICE"].toFixed(4)));
+			cnt.push(parseFloat(price[coin]["USD"]["MKTCAP"].toFixed(0)));
 			result[coin] = cnt;
 		});
 
@@ -121,18 +124,23 @@ setInterval(function() {
 
 
 app.use(myParser.urlencoded({extended : true}));
+app.use(express.static(__dirname + 'public'));
+
+/*
 app.get('/', (req, res) =>  {
 	res.sendFile(path.join(__dirname, "/index.html"));
 });
+*/
 
-app.post('/', (req, res) =>  {
+app.get('/', (req, res) =>  {
+	let headers = {};
 	headers["Access-Control-Allow-Origin"] = "*";
 	headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS";
 	headers["Access-Control-Allow-Credentials"] = false;
 	headers["Access-Control-Max-Age"] = '86400'; // 24 hours
 	headers["Access-Control-Allow-Headers"] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept";
 
-	res.writeHead(200, headers);
+	res.set(headers);
 	coinsData( sendData, res);
 });
 
@@ -143,9 +151,8 @@ app.options('/', (req, res) => {
 	headers["Access-Control-Allow-Credentials"] = false;
 	headers["Access-Control-Max-Age"] = '86400'; // 24 hours
 	headers["Access-Control-Allow-Headers"] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept";
-	res.writeHead(200, headers);
+	res.set(headers);	
 	res.end();
-	
 });
 
 app.post('/getimages', (req, res) => {	
@@ -159,4 +166,4 @@ app.post('/getimages', (req, res) => {
 	res.send(req.body);
 });
 
-app.listen(3128);
+app.listen(80);

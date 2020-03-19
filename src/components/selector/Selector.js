@@ -4,11 +4,26 @@ import "./selector.css";
 class Selector extends Component {
    constructor(props) {
       super(props);
+      
       this.state = {
          lastLabel: this.props.label, 
          label: this.props.label, 
-         curs : this.props.curs
+         curs : this.props.curs,
+         available: {},
+         dontShowPerm: [].concat(this.props.dontShow), 
+         dontShow: [].concat(this.props.dontShow), 
+         mark: 0
       }
+      
+   }
+
+   static getDerivedStateFromProps(props, state) {
+      if (props.curs !== state.curs) {
+         return {
+            curs: props.curs
+         };
+      }
+      return null;
    }
 
    hideMenus = () => {
@@ -24,7 +39,10 @@ class Selector extends Component {
       const submenu = element.querySelector(".select-submenu");
       const label = element.querySelector(".selector__label");
 
-      if(submenu.style.display === "block" && e.target.className !== "selector__label"){
+      if(
+         submenu.style.display === "block" && 
+         e.target.className !== "selector__label"
+      ){
          submenu.style.display = "none";
          label.style.cursor = "pointer";
          this.setState({label: this.state.lastLabel});
@@ -62,21 +80,42 @@ class Selector extends Component {
    }
 
    convertToLabel = (val) => {
-      let ret = "";
-      this.state.curs.forEach( ( item ) => {
-         if(val.toUpperCase().includes(item[1]) || val.toUpperCase().includes(item[2].toUpperCase()))
-            ret = item[2] + " (" + item[1] + ")";       
-      });
-      return ret;
+      for(let item in this.props.curs) {
+         if(
+            item.includes(val.toUpperCase()) || 
+            this.props.curs[item][0].toUpperCase().includes(val.toUpperCase())
+         ){
+            return this.state.curs[item][0] + " (" + item + ")"; 
+         }
+      }
+
+      return null;
+   }
+
+   convertToCur = (val) => {
+      for(let item in this.props.curs) {
+         if(
+            item.includes(val.toUpperCase()) || 
+            this.props.curs[item][0].toUpperCase().includes(val.toUpperCase())
+         ){
+            return item; 
+         }
+      }
+
+      return null;
    }
 
    select = (e) => {
-      const label = this.convertToLabel(e.target.value);
+      let val = e.target.value;
       
+      if(!val)
+         val = e.target.innerText;
+      val = val.toUpperCase();
+      const label = this.convertToLabel(val);
+      const cur = this.convertToCur(val);
 
-      if(label !== "") {
+      if(label !== null) {
          const id = e.target.parentElement.parentElement.querySelector(".selector__label").id;
-         const cur = e.target.getAttribute('cur');
          
          this.props.setCur.bind(this, id, cur);
          this.props.setCur(id, cur);
@@ -128,33 +167,75 @@ class Selector extends Component {
    search = (val) => {
       let curs= [];
       
-      if(val === ""){
-         curs = this.props.curs
-      } else {
-         this.props.curs.forEach( ( item ) => {
-            if(item[1].includes(val.toUpperCase()) || item[2].toUpperCase().includes(val.toUpperCase()))
+      if(val !== ""){
+
+         for(let item in this.props.curs) {      
+            if(!(
+               item.includes(val.toUpperCase()) || 
+               this.props.curs[item][0].toUpperCase().includes(val.toUpperCase())
+            
+            )){
                curs.push(item);
-         });
+            };
+         }
+
       }
-      
-      this.setState( {curs: curs} );
+
+      this.setState( {dontShow: this.state.dontShowPerm.concat(curs) } );
    }
 
    onKeyDown = (e) => {
       const parent = e.target.parentElement.parentElement;
       if(e.key === "Enter"){
-         parent.querySelector(".select-submenu").style.display = "none";
-         this.select(e)
+         this.select(e);
+         parent.querySelector(".select-submenu").style.display = "none";   
+         
       } else if(e.key === "ArrowDown"){
          this.hoverItemOnArrow(parent, 1);
       } else if(e.key === "ArrowUp") {
          this.hoverItemOnArrow(parent, -1);
+      } else if(e.key === "Escape"){
+         document.querySelector(".select-submenu").style.display = "none";
+         const lable = document.querySelector(".selector__label");
+         lable.style.cursor = "pointer";
+         lable.blur();
+         this.setState({label: this.state.lastLabel});
       }
    }
 
-   selectItem = (e) => {
-      e.target.value=e.target.innerText; 
+   selectItem = (e) => { 
       this.select(e);
+   }
+
+   getField = (symbol) => {
+
+      //here
+      if(!(this.state.dontShow.includes(symbol))) {
+         return (         
+            <div
+               className="select-submenu__item" 
+               key={symbol} 
+               onClick={this.selectItem} 
+               onMouseEnter={this.hoverItem}
+            >
+               {this.state.curs[symbol][0] } ({symbol})
+            </div>    
+         );
+      }
+   }
+
+   getFields = () => {
+      let ret = [];
+      for(let key in this.state.curs){ 
+         if(!this.state.dontShow.includes(key)){
+            try {
+               ret.push(this.getField(key));
+            } catch(err) {
+               console.log(err);
+            }
+         }
+      }
+      return ret;
    }
 
    render() {
@@ -162,27 +243,14 @@ class Selector extends Component {
          <div className="select">
             <div className="select selector" onClick={this.menu}>
                <input className="selector__label" onChange={this.changeInput} onKeyDown={this.onKeyDown} id={this.props.id} value={this.state.label} />
-               <div className="selector__select"
-               >
+               <div className="selector__select">
                   <div className="selector__arrowwrapper">
                      <div className="selector__arrow"></div>
                   </div>
                </div>
             </div>
             <div className="select select-submenu">
-               { 
-                  this.state.curs.map( (cur) => (
-                  <div 
-                     className="select-submenu__item" 
-                     key={cur[0]} 
-                     onClick={this.selectItem} 
-                     onMouseEnter={this.hoverItem}
-                     cur={ cur[1] }
-                  >
-                     {cur[2] } ({cur[1]})
-                  </div>    
-                  ))
-               }
+               {this.getFields()}
             </div> 
          </div>
       )
@@ -190,7 +258,3 @@ class Selector extends Component {
 }
 
 export default Selector;
-
-/* 
-   tests
-*/

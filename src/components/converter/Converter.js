@@ -3,6 +3,15 @@ import Selector from './../selector/Selector'
 import "./converter.css"
 
 class Converter extends Component {
+   findValue = (cur) => {
+      let ret = 1;
+      try {
+         ret = this.props.curs[cur][4];
+      }
+      catch(err) {;}
+      return ret;
+   }
+
    constructor(props) {
       super(props);
       this.field1 = React.createRef();
@@ -10,10 +19,10 @@ class Converter extends Component {
       this.field1.current = 1;
       this.field2.current = this.findValue("BTC");
    }
-
+   
    state = {
       from: this.findValue("BTC"),
-      to: this.findValue("USD")
+      to: 1
    }
 
    setCur = (id, cur) => {
@@ -48,16 +57,6 @@ class Converter extends Component {
       } else { 
          return [this.state.to, this.state.from, this.field2, this.field1, "field-1"];
       }
-   }
-
-   findValue(cur) {
-      let ret;
-      this.props.curs.forEach( el => {
-         if(el[1] === cur){
-            ret = el[3]
-         }
-      });
-      return ret;
    }
 
    converter = (e) => {
@@ -105,6 +104,7 @@ class Converter extends Component {
          </div>
       )
    }
+   
 }
 
 export default Converter;

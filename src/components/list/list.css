@@ -1,0 +1,13 @@
+.list {
+   padding: 50px 0;
+}
+
+.list__inner {
+   background-color: var(--bg-second);
+   padding: 50px;
+   width: 100%;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+
+}
