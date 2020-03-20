@@ -1,30 +1,38 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 import Converter from "./components/converter/Converter";
 import List from "./components/list/List";
 import axios from 'axios';
 
-class App extends Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      currencies : {}
-    };
-  }
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
 
-  componentDidMount() {   
-    this.getList(this.setList);
-    this.interval = setInterval(() => {
-      //this.getList(this.setList);
-    }, 5000);
-  }
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+
+}
+
+function App() {
+  const [currencies, setCurrencies] = useState({});
+
+  const setList = (list) => {
+    setCurrencies({...{USD:["Dollar", 1, 1, 1, 1, 1]}, ...list});
   }
   
-  getList = (callback) => {
+  const getList = (callback) => {
+    console.log("Updating...");
     axios.get('http://localhost:80/')
     .then(function (response) {
        callback(response["data"]["data"]);
@@ -33,28 +41,32 @@ class App extends Component {
        console.log(error);
     });
   }
+  
+  useInterval(() => {
+    //getList(setList)
+  }, 5000);
 
-  setList = (list) => {
-    this.setState({ currencies: list});
-  }
+  useEffect(() => {
+    getList(setList);  
+  }, [])
 
-  render() {
-    console.log("In the <App>");
-    console.log(this.state.currencies);
-
+  if(!(
+    Object.keys(currencies).length === 0 && 
+    currencies.constructor === Object
+  )){
+    console.log(currencies);
     return (
-      <div className="app"> 
-        <Converter curs={this.state.currencies} />
-        <List curs={this.state.currencies} />
+      <div className="app">
+        <Converter curs={currencies} /> 
+        <List curs={currencies} />
       </div>
     );
   }
+  return <div className="app"></div>;
 }
 
-// array of items where data is contained in the state; map;
 
 /*
-        
   // Links
   * https://www.chartjs.org/
   * https://coinmarketcap.com/converter/
@@ -74,4 +86,4 @@ class App extends Component {
   * 
 */
 
-export { App as default };
+export default App;

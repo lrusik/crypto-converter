@@ -1,40 +1,30 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect, useRef } from 'react';
+
 import "./selector.css";
 
-class Selector extends Component {
-   constructor(props) {
-      super(props);
-      
-      this.state = {
-         lastLabel: this.props.label, 
-         label: this.props.label, 
-         curs : this.props.curs,
-         available: {},
-         dontShowPerm: [].concat(this.props.dontShow), 
-         dontShow: [].concat(this.props.dontShow), 
-         mark: 0
-      }
-      
+function Selector(props) {   
+   const lastLabel = useRef(props.label);
+   const curLabel = useRef(props.label);
+   const dontShow = useRef([].concat(props.dontShow));
+   const [currencies] = useState(props.curs);
+
+   const updateConverterData = (id, cur) => {   
+      props.setCur.bind(this, id, cur);
+      props.setCur(id, cur);
    }
 
-   static getDerivedStateFromProps(props, state) {
-      if (props.curs !== state.curs) {
-         return {
-            curs: props.curs
-         };
-      }
-      return null;
-   }
-
-   hideMenus = () => {
+   const hideMenus = () => {
       const submenus = document.querySelectorAll(".select-submenu");
-      submenus.forEach( (submenu) => {       
+      submenus.forEach( (submenu) => {   
+         const lable = submenu.parentElement.querySelector(".selector__label");    
+         lable.style.cursor = "pointer";
+         lable.blur();
          submenu.style.display = "none"
-         this.setState({label: this.state.lastLabel});
+         curLabel.current = lastLabel.current;
       });
    }
 
-   menu = (e) => {
+   const menu = (e) => {
       const element = e.currentTarget.parentElement.parentElement;
       const submenu = element.querySelector(".select-submenu");
       const label = element.querySelector(".selector__label");
@@ -45,9 +35,9 @@ class Selector extends Component {
       ){
          submenu.style.display = "none";
          label.style.cursor = "pointer";
-         this.setState({label: this.state.lastLabel});
+         curLabel.current = lastLabel.current;
       } else { 
-         this.hideMenus();
+         hideMenus();
          submenu.style.display = "block";   
          label.style.cursor = "text";
          label.focus();
@@ -55,7 +45,7 @@ class Selector extends Component {
       }
    }
 
-   outsiteMenuEvent = (event) => {
+   const outsiteMenuEvent = (event) => {
       const selector_classes = [
          "selector__arrowwrapper", 
          "selector__arrow",
@@ -65,38 +55,61 @@ class Selector extends Component {
       ];
       return selector_classes.includes(event);
    }
+   
+   const handleClickEvent = (e) => {
+      if(! outsiteMenuEvent(e.target.className) ){ 
+         hideMenus();
+      }
+   }
+   
+   useEffect(() => {
+      document.addEventListener('click', handleClickEvent);  
+   }, [])
 
-   componentDidMount() {
-      document.addEventListener('click', (e) => {
-         if(! this.outsiteMenuEvent(e.target.className) ){ 
-            this.hideMenus();
+   const search = (val) => {
+      let curs= [];
+      
+      if(val !== ""){
+
+         for(let item in props.curs) {      
+            if(!(
+               item.includes(val.toUpperCase()) || 
+               props.curs[item][0].toUpperCase().includes(val.toUpperCase())
+            )){
+               curs.push(item);
+            };
          }
-      });
+
+      }
+      dontShow.current = curs.concat(props.dontShow);
    }
 
-   changeInput = (e) => {
-      this.setState( { label: e.target.value });
-      this.search(e.target.value);
+   const changeInput = (e) => {
+      curLabel.current = e.target.value;
+      search(e.target.value);
    }
 
-   convertToLabel = (val) => {
-      for(let item in this.props.curs) {
+   const convertToLabel = (val) => {
+      for(let item in props.curs) {
          if(
             item.includes(val.toUpperCase()) || 
-            this.props.curs[item][0].toUpperCase().includes(val.toUpperCase())
+            props.curs[item][0].toUpperCase().includes(val.toUpperCase()) || 
+            val.toUpperCase() ===  props.curs[item][0].toUpperCase() + " (" + item.toUpperCase() + ")"
          ){
-            return this.state.curs[item][0] + " (" + item + ")"; 
+            return currencies[item][0] + " (" + item + ")"; 
          }
       }
 
       return null;
    }
 
-   convertToCur = (val) => {
-      for(let item in this.props.curs) {
+   const convertToCur = (val) => {
+      for(let item in props.curs) {
          if(
             item.includes(val.toUpperCase()) || 
-            this.props.curs[item][0].toUpperCase().includes(val.toUpperCase())
+            props.curs[item][0].toUpperCase().includes(val.toUpperCase()) ||
+            val.toUpperCase() ===  props.curs[item][0].toUpperCase() + " (" + item.toUpperCase() + ")"
+            
          ){
             return item; 
          }
@@ -105,37 +118,38 @@ class Selector extends Component {
       return null;
    }
 
-   select = (e) => {
+   const select = (e) => {
       let val = e.target.value;
       
       if(!val)
          val = e.target.innerText;
+
       val = val.toUpperCase();
-      const label = this.convertToLabel(val);
-      const cur = this.convertToCur(val);
+
+      const label = convertToLabel(val);
+      const cur = convertToCur(val);      
 
       if(label !== null) {
          const id = e.target.parentElement.parentElement.querySelector(".selector__label").id;
-         
-         this.props.setCur.bind(this, id, cur);
-         this.props.setCur(id, cur);
-         
-         this.setState( { label: label, lastLabel: label });
+
+         updateConverterData(id, cur);
+         curLabel.current = label;
+         lastLabel.current = label;
       } else {
-         this.setState( { label: this.state.lastLabel });
+         curLabel.current = lastLabel.current;
       }
    }
 
-   hoverItem = (e) => {
+   const hoverItem = (e) => {
       const items = document.querySelectorAll(".select-submenu__item");
       items.forEach( (item) => {
          item.classList.remove("select-submenu__item_active");      
       });
       e.target.classList.add("select-submenu__item_active");
-      this.setState({label: e.target.innerText});
+      curLabel.current = e.target.innerText;
    }
 
-   hoverItemOnArrow = (parent, pos) => {
+   const hoverItemOnArrow = (parent, pos) => {
       const items = parent.querySelectorAll('.select-submenu__item');
       let active = -1;
       let next;
@@ -161,100 +175,90 @@ class Selector extends Component {
       }  
 
       items[next].classList.add("select-submenu__item_active");
-      this.setState({label: items[next].innerText});
+      curLabel.current = items[next].innerText;
    }
 
-   search = (val) => {
-      let curs= [];
-      
-      if(val !== ""){
-
-         for(let item in this.props.curs) {      
-            if(!(
-               item.includes(val.toUpperCase()) || 
-               this.props.curs[item][0].toUpperCase().includes(val.toUpperCase())
-            
-            )){
-               curs.push(item);
-            };
-         }
-
-      }
-
-      this.setState( {dontShow: this.state.dontShowPerm.concat(curs) } );
+   const scrollHandler = (e) => {
+      const el = e.target.parentElement.parentElement.querySelector(".select-submenu__item_active");
+      if(el.offsetTop > 160)
+         el.parentElement.scrollTop = el.offsetTop;
+      else 
+         el.parentElement.scrollTop = 0;
    }
 
-   onKeyDown = (e) => {
+   const onKeyDown = (e) => {
       const parent = e.target.parentElement.parentElement;
       if(e.key === "Enter"){
-         this.select(e);
+         select(e);
          parent.querySelector(".select-submenu").style.display = "none";   
          
       } else if(e.key === "ArrowDown"){
-         this.hoverItemOnArrow(parent, 1);
+         
+         hoverItemOnArrow(parent, 1);
+         scrollHandler(e);
       } else if(e.key === "ArrowUp") {
-         this.hoverItemOnArrow(parent, -1);
+         hoverItemOnArrow(parent, -1);
+         scrollHandler(e);
       } else if(e.key === "Escape"){
-         document.querySelector(".select-submenu").style.display = "none";
-         const lable = document.querySelector(".selector__label");
-         lable.style.cursor = "pointer";
-         lable.blur();
-         this.setState({label: this.state.lastLabel});
+         hideMenus()
       }
    }
 
-   selectItem = (e) => { 
-      this.select(e);
+   const selectItem = (e) => { 
+      select(e);
    }
 
-   getField = (symbol) => {
-
-      //here
-      if(!(this.state.dontShow.includes(symbol))) {
+   const getField = (symbol) => {
+      if(!(dontShow.current.includes(symbol))) {
          return (         
             <div
                className="select-submenu__item" 
                key={symbol} 
-               onClick={this.selectItem} 
-               onMouseEnter={this.hoverItem}
+               onClick={selectItem} 
+               onMouseEnter={hoverItem}
             >
-               {this.state.curs[symbol][0] } ({symbol})
+               {currencies[symbol][0] } ({symbol})
             </div>    
          );
       }
    }
 
-   getFields = () => {
+   const getFields = () => {
       let ret = [];
-      for(let key in this.state.curs){ 
-         if(!this.state.dontShow.includes(key)){
-            try {
-               ret.push(this.getField(key));
-            } catch(err) {
-               console.log(err);
-            }
+      for(let key in currencies){ 
+         try {
+            ret.push(getField(key));
+         } catch(err) {
+            console.log(err);
          }
       }
       return ret;
    }
 
-   render() {
-      return (
-         <div className="select">
-            <div className="select selector" onClick={this.menu}>
-               <input className="selector__label" onChange={this.changeInput} onKeyDown={this.onKeyDown} id={this.props.id} value={this.state.label} />
-               <div className="selector__select">
-                  <div className="selector__arrowwrapper">
-                     <div className="selector__arrow"></div>
-                  </div>
+   return (
+      <div className="select">
+         <div className="select selector" onClick={menu}>
+            <input 
+               className="selector__label" 
+               onChange={changeInput} 
+               onKeyDown={onKeyDown} 
+               id={props.id} 
+               value={curLabel.current}
+               autoComplete="off"
+            />
+
+            <div className="selector__select">
+               <div className="selector__arrowwrapper">
+                  <div className="selector__arrow"></div>
                </div>
             </div>
-            <div className="select select-submenu">
-               {this.getFields()}
-            </div> 
          </div>
-      )
-   }
+         <div className="select select-submenu">
+            {getFields()}
+         </div> 
+      </div>
+   )
+   
 }
 
 export default Selector;
