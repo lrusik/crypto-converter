@@ -62,26 +62,16 @@ function App() {
       </div>
     );
   }
-  return <div className="app"></div>;
+  return (
+    <div className="app loader-wrapper">
+      <div class="loader">
+      </div>
+    </div>
+    );
 }
 
 
 /*
-  // Links
-  * https://www.chartjs.org/
-  * https://coinmarketcap.com/converter/
-  * https://coinlib.io/cryptocurrency-converter
-  * https://shapeshift.io/#/coins
-  * 
-  * https://www.coinbase.com/price
-  * https://coinmarketcap.com/all/views/all/
-  * 
-  * ultimate winner : https://www.livecoinwatch.com/
-  * 
-  * converter : https://www.google.com/search?q=rub+to+shekel&oq=rub+to+&aqs=chrome.1.69i57j35i39j0l4.2572j1j7&client=ubuntu&sourceid=chrome&ie=UTF-8
-  * 
-  * https://www.cryptocurrencychart.io/
-  * https://info.binance.com/en
   * https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications
   * 
 */
