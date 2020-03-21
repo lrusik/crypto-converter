@@ -11,8 +11,3 @@ it('Renders without crashing', () =>  {
    ReactDOM.render(<Selector />, div);
    ReactDOM.unmountComponentAtNode(div);
 });
-
-it("matches snapshot", () => {
-   const tree = renderer.create(<Selector />).toJSON();
-   expect(tree).toMatchSnapshot();
-});

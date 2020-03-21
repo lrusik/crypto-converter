@@ -1,5 +1,0 @@
-exports[`test matches snapshot 1`] = `
-<div
-  className="selector"
-  onClick={[Function]} />
-`;
