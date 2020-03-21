@@ -50,7 +50,7 @@ async function coinsData() {
 	for(let i=0; i < 50; i++) {
 		let file = __dirname + '/build/static/img/' + coinsAvailable[i] + ".png";
 		if(!fs.existsSync(file))
-			cacheImage(coins["data"][i]["image"]["thumb"], file);
+			cacheImage(coins["data"][i]["image"]["small"], file);
 		try {	
 			result[coinsAvailable[i]] = [ 
 				coins["data"][i]["name"],

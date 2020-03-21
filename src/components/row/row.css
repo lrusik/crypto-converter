@@ -12,7 +12,7 @@
 
 @keyframes highlight {
    0% {
-      opacity: .5;
+      opacity: .3;
    }
    50% {
       opacity: .8;
