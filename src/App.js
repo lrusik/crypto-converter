@@ -2,7 +2,6 @@ import React, { useCallback, useState, useEffect } from 'react';
 import './App.css';
 
 import Converter from "./components/converter/Converter";
-import List from "./components/list/List";
 import { useDispatch } from 'react-redux';
 import * as infoAction from './actions/info'; 
 import useInterval from './functions/useinterval';
@@ -34,7 +33,6 @@ function App() {
     return (
       <div className="app">
         <Converter curs={currencies} /> 
-        <List curs={currencies} />
       </div>
     );
   }

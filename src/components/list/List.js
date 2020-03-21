@@ -61,11 +61,11 @@ function List(props) {
 
       return ret;
    }
-
+   
    return (
       <div className="list">
          <div className="list__inner container">
-            <Row 
+            <Row
                className="row__header"
                id="#" 
                symbol="Coin" 

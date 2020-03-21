@@ -1,16 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import "./selector.css";
-
+import { useDispatch, useStore } from 'react-redux';
+import * as converterAction from './../../actions/converter';
+import * as labelAction from './../../actions/label';
 
 function Selector(props) {   
    const [lastLabel, setLastLabel] = useState(props.label);
    const [curLabel, setCurLabel] = useState(props.label);
    const [dontShow, setDontShow] = useState([].concat(props.dontShow));
    const [currencies] = useState(props.curs);
+   const dispatch = useDispatch();
+   const setOrigin = useCallback((val) =>  { 
+         dispatch(converterAction.setOrigin( val ))
+      }, [dispatch]
+   ); 
 
-   const updateConverterData = (id, cur) => {   
-      props.setCur.bind(this, id, cur);
-      props.setCur(id, cur);
+   const convertToLabel = (val) => {
+      for(let item in props.curs) {
+         if(
+            item.includes(val.toUpperCase()) || 
+            props.curs[item][0].toUpperCase().includes(val.toUpperCase()) || 
+            val.toUpperCase() ===  props.curs[item][0].toUpperCase() + " (" + item.toUpperCase() + ")"
+         ){
+            return currencies[item][0] + " (" + item + ")"; 
+         }
+      }
+
+      return null;
+   }
+
+   const store = useStore();
+   const setLabel = useCallback((val) =>  { 
+         dispatch(labelAction.setLabel( val ))
+      }, [dispatch]
+   ); 
+
+   store.subscribe(() => {
+      let label = store.getState()["label"][props.id];
+      if (label !== "") {
+         setCurLabel(convertToLabel(label));
+         setLabel([props.id, ""]);
+      }
+   });
+   
+   const updateConverterData = (id, cur) => {
+      if(id === "from")
+         id = "field-1"
+      else 
+         id = "field-2"
+
+      setOrigin([id, cur]);
    }
 
    const hideMenus = () => {
@@ -19,8 +58,7 @@ function Selector(props) {
          const lable = submenu.parentElement.querySelector(".selector__label");    
          lable.style.cursor = "pointer";
          lable.blur();
-         submenu.style.display = "none"
-         setCurLabel(lastLabel);
+         submenu.style.display = "none";
       });
    }
 
@@ -88,20 +126,6 @@ function Selector(props) {
       search(e.target.value);
    }
 
-   const convertToLabel = (val) => {
-      for(let item in props.curs) {
-         if(
-            item.includes(val.toUpperCase()) || 
-            props.curs[item][0].toUpperCase().includes(val.toUpperCase()) || 
-            val.toUpperCase() ===  props.curs[item][0].toUpperCase() + " (" + item.toUpperCase() + ")"
-         ){
-            return currencies[item][0] + " (" + item + ")"; 
-         }
-      }
-
-      return null;
-   }
-
    const convertToCur = (val) => {
       for(let item in props.curs) {
          if(
@@ -130,7 +154,6 @@ function Selector(props) {
 
       if(label !== null) {
          const id = e.target.parentElement.parentElement.querySelector(".selector__label").id;
-
          updateConverterData(id, cur);
          setCurLabel(label);
          setLastLabel(label);
@@ -199,7 +222,8 @@ function Selector(props) {
          hoverItemOnArrow(parent, -1);
          scrollHandler(e);
       } else if(e.key === "Escape"){
-         hideMenus()
+         hideMenus();
+         setCurLabel(lastLabel);
       }
    }
 

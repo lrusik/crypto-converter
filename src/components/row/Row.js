@@ -1,7 +1,25 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import "./row.css";
+import { useDispatch } from 'react-redux';
+import * as converterAction from './../../actions/converter';
+import * as labelAction from './../../actions/label';
 
 function Row(props) {
+   const dispatch = useDispatch();
+   const setOrigin = useCallback((val) =>  { 
+         dispatch(converterAction.setOrigin( val ))
+      }, [dispatch]
+   ); 
+
+   const setLabel = useCallback((val) =>  { 
+         dispatch(labelAction.setLabel( val ))
+      }, [dispatch]
+   ); 
+   
+   const updateConverterData = (id, cur) => {
+      setOrigin([id, cur]);
+   }
+
    const colorToProc = (ar) => {
       return (
          (ar[0] === "+") ? 
@@ -12,8 +30,13 @@ function Row(props) {
       );
    }
 
+   const onClick = () => {   
+      setLabel(["from", props.symbol]);
+      updateConverterData("field-1", props.symbol);
+   }
+
    return (
-      <div className={"row " + props.className}>
+      <div className={"row " + props.className} onClick={onClick}>
          <div className="row__arrange">
             <div className={"row__arrow " + props.grow}></div>
             <div className="row__id justify-buttom">{props.id} </div>
