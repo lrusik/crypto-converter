@@ -35,10 +35,10 @@ function List(props) {
             symbol={symbol} 
             name={props.curs[symbol][0]}
             change={((props.curs[symbol][1] > 0) ? "+":"") + props.curs[symbol][1] + "%"}
-            grow={ getRowArrowClass(props.curs[symbol][3]) }
-            price={"$ " + parseFloat(props.curs[symbol][4]).toFixed(2)}
-            marketCap={"$ " + moneySuffix(props.curs[symbol][5])}
-            img={props.curs[symbol][2]}
+            grow={ getRowArrowClass(props.curs[symbol][2]) }
+            price={"$ " + parseFloat(props.curs[symbol][3]).toFixed(2)}
+            marketCap={"$ " + moneySuffix(props.curs[symbol][4])}
+            img={"static/img/" + symbol + ".png"}
          />
       );
    }

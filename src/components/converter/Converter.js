@@ -10,7 +10,7 @@ function Converter(props) {
    const findValue = (cur) => {
       let ret = 1;
       try {
-         ret = props.curs[cur][4];
+         ret = props.curs[cur][3];
       }
       catch(err) {
          console.log(err)

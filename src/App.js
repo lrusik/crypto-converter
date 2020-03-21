@@ -30,6 +30,7 @@ function App() {
   if(
     Object.keys(currencies).length !== 0
   ){
+    console.log(currencies);
     return (
       <div className="app">
         <Converter curs={currencies} /> 

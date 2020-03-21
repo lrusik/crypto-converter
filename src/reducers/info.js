@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const setList = () => {
-   return axios.get('http://localhost:80/')
+   return axios.get('http://localhost:8080/data')
 }
 
 const getList = (list, callback) => {
