@@ -2,12 +2,36 @@
    display: flex;
    padding: 10px;
    align-items: center;
+   cursor: pointer;
+   transition: background .4s;
+}
+
+.row_animate {
+   animation: highlight .5s;
+}
+
+@keyframes highlight {
+   0% {
+      opacity: .5;
+   }
+   50% {
+      opacity: .8;
+      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+   }
+   100% {
+      opacity: 1;
+   }
+}
+
+.row:hover {
+   background-color: #40404f;
 }
 
 .row * {
    padding: 2px;
    font-size: 16px;
 }
+
 
 .row__arrange {
    margin-left: 50px;
@@ -93,6 +117,11 @@
    position: relative;
    align-items: none;
    margin-bottom: 5px;
+   background-color: transparent;
+}
+
+.row__header:hover {
+   background-color: transparent;
 }
 
 .row__header:after {

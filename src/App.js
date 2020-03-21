@@ -24,7 +24,7 @@ function App() {
   }, [])
 
   useInterval(() => {
-    //updateCurrencies();
+    updateCurrencies();
   }, 5000);
 
   if(

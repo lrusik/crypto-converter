@@ -30,13 +30,19 @@ function Row(props) {
       );
    }
 
+   const addAnimation = () => {
+      if(props.grow !== '') {
+         return " row_animate";
+      }
+   }
+
    const onClick = () => {   
       setLabel(["from", props.symbol]);
       updateConverterData("field-1", props.symbol);
    }
-
+   
    return (
-      <div className={"row " + props.className} onClick={onClick}>
+      <div className={"row " + props.className + " " + addAnimation()} onClick={onClick}>
          <div className="row__arrange">
             <div className={"row__arrow " + props.grow}></div>
             <div className="row__id justify-buttom">{props.id} </div>
@@ -55,6 +61,7 @@ function Row(props) {
          <div className="row__marketcap row__item">{props.marketCap}</div>
          <div className={"row__change row__item " + colorToProc(props.change)}>{props.change}</div>
       </div>
+      
    );
 
 }
