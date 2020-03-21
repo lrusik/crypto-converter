@@ -5,7 +5,7 @@ import Converter from "./components/converter/Converter";
 import List from "./components/list/List";
 import { useDispatch } from 'react-redux';
 import * as infoAction from './actions/info'; 
-import useInterval from './useinterval';
+import useInterval from './functions/useinterval';
 
 function App() {
   const [currencies, setCurrencies] = useState({});

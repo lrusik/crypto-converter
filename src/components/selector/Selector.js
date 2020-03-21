@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-
+import React, { useState, useEffect } from 'react';
 import "./selector.css";
 
+
 function Selector(props) {   
-   const lastLabel = useRef(props.label);
-   const curLabel = useRef(props.label);
-   const dontShow = useRef([].concat(props.dontShow));
+   const [lastLabel, setLastLabel] = useState(props.label);
+   const [curLabel, setCurLabel] = useState(props.label);
+   const [dontShow, setDontShow] = useState([].concat(props.dontShow));
    const [currencies] = useState(props.curs);
 
    const updateConverterData = (id, cur) => {   
@@ -20,7 +20,7 @@ function Selector(props) {
          lable.style.cursor = "pointer";
          lable.blur();
          submenu.style.display = "none"
-         curLabel.current = lastLabel.current;
+         setCurLabel(lastLabel);
       });
    }
 
@@ -35,7 +35,7 @@ function Selector(props) {
       ){
          submenu.style.display = "none";
          label.style.cursor = "pointer";
-         curLabel.current = lastLabel.current;
+         setCurLabel(lastLabel);
       } else { 
          hideMenus();
          submenu.style.display = "block";   
@@ -70,7 +70,6 @@ function Selector(props) {
       let curs= [];
       
       if(val !== ""){
-
          for(let item in props.curs) {      
             if(!(
                item.includes(val.toUpperCase()) || 
@@ -81,11 +80,11 @@ function Selector(props) {
          }
 
       }
-      dontShow.current = curs.concat(props.dontShow);
+      setDontShow( curs.concat(props.dontShow) );
    }
 
    const changeInput = (e) => {
-      curLabel.current = e.target.value;
+      setCurLabel(e.target.value);
       search(e.target.value);
    }
 
@@ -133,10 +132,10 @@ function Selector(props) {
          const id = e.target.parentElement.parentElement.querySelector(".selector__label").id;
 
          updateConverterData(id, cur);
-         curLabel.current = label;
-         lastLabel.current = label;
+         setCurLabel(label);
+         setLastLabel(label);
       } else {
-         curLabel.current = lastLabel.current;
+         setCurLabel(lastLabel);
       }
    }
 
@@ -146,7 +145,7 @@ function Selector(props) {
          item.classList.remove("select-submenu__item_active");      
       });
       e.target.classList.add("select-submenu__item_active");
-      curLabel.current = e.target.innerText;
+      setCurLabel(e.target.innerText);
    }
 
    const hoverItemOnArrow = (parent, pos) => {
@@ -175,7 +174,7 @@ function Selector(props) {
       }  
 
       items[next].classList.add("select-submenu__item_active");
-      curLabel.current = items[next].innerText;
+      setCurLabel(items[next].innerText);
    }
 
    const scrollHandler = (e) => {
@@ -209,7 +208,7 @@ function Selector(props) {
    }
 
    const getField = (symbol) => {
-      if(!(dontShow.current.includes(symbol))) {
+      if(!(dontShow.includes(symbol))) {
          return (         
             <div
                className="select-submenu__item" 
@@ -243,7 +242,7 @@ function Selector(props) {
                onChange={changeInput} 
                onKeyDown={onKeyDown} 
                id={props.id} 
-               value={curLabel.current}
+               value={curLabel}
                autoComplete="off"
             />
 
