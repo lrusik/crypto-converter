@@ -1,8 +1,8 @@
-import curInfo from "./curInfo";
+import info from "./info";
 import { combineReducers } from "redux";
 
 const reducers = combineReducers({ 
-   info: curInfo
+   info: info
 });
 
 export default reducers;

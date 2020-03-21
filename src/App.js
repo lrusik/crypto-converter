@@ -1,60 +1,36 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import './App.css';
 
 import Converter from "./components/converter/Converter";
 import List from "./components/list/List";
-import axios from 'axios';
-
-function useInterval(callback, delay) {
-  const savedCallback = useRef();
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  useEffect(() => {
-    function tick() {
-      savedCallback.current();
-    }
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-
-}
+import { useDispatch } from 'react-redux';
+import * as infoAction from './actions/info'; 
+import useInterval from './useinterval';
 
 function App() {
   const [currencies, setCurrencies] = useState({});
+  const dispatch = useDispatch();
 
   const setList = (list) => {
     setCurrencies({...{USD:["Dollar", 1, 1, 1, 1, 1]}, ...list});
   }
-  
-  const getList = (callback) => {
-    console.log("Updating...");
-    axios.get('http://localhost:80/')
-    .then(function (response) {
-       callback(response["data"]["data"]);
-    })
-    .catch(function (error) {
-       console.log(error);
-    });
-  }
-  
-  useInterval(() => {
-    //getList(setList)
-  }, 5000);
+
+  const updateCurrencies = useCallback(
+    () => dispatch(infoAction.update( setList )),
+    [dispatch]
+  );  
 
   useEffect(() => {
-    getList(setList);  
+    updateCurrencies();    
   }, [])
 
-  if(!(
-    Object.keys(currencies).length === 0 && 
-    currencies.constructor === Object
-  )){
-    console.log(currencies);
+  useInterval(() => {
+    //updateCurrencies();
+  }, 5000);
+
+  if(
+    Object.keys(currencies).length !== 0
+  ){
     return (
       <div className="app">
         <Converter curs={currencies} /> 
@@ -62,18 +38,13 @@ function App() {
       </div>
     );
   }
+
   return (
     <div className="app loader-wrapper">
-      <div class="loader">
+      <div className="loader">
       </div>
     </div>
     );
 }
-
-
-/*
-  * https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications
-  * 
-*/
 
 export default App;
